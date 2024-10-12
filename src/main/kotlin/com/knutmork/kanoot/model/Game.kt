@@ -18,7 +18,7 @@ enum class GameState {
 }
 
 @Serializable
-data class Game(
+class Game(
     val id: String,
     val pin: String,
     val title: String,
@@ -26,6 +26,9 @@ data class Game(
     val questions: MutableList<Question> = mutableListOf(),
     var state: GameState = GameState.READY
 ) {
+    val leaderboard: Leaderboard
+        get() = Leaderboard(players.sortedByDescending { it.pointsTotal })
+
     private val questionTimers = mutableMapOf<Int, Job>()
 
     companion object {
@@ -41,7 +44,7 @@ data class Game(
     }
 
     fun currentQuestion(): Question? {
-        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
+        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 } // TODO: Should we use state instead?
     }
 
     fun addPlayer(playerName: String): Player {

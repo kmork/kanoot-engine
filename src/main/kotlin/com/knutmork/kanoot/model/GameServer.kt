@@ -24,9 +24,7 @@ class GameServer {
     }
 
     fun showLeaderboard(uuid: String): Leaderboard? {
-        return gameByUuid(uuid)?.let { game ->
-            Leaderboard(game.players.sortedByDescending { player -> player.pointsTotal })
-        }
+        return gameByUuid(uuid)?.leaderboard
     }
 
     fun removeGame(gameId: String) {
