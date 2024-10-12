@@ -31,7 +31,7 @@ class GameServer {
 
     fun removeGame(gameId: String) {
         gameByUuid(gameId)?.endGame()
-        val game = games.remove(gameId)
+        games.remove(gameId)
     }
 
     private fun gameByUuid(uuid: String): Game? {

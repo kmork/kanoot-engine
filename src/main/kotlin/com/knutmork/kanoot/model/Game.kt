@@ -44,7 +44,7 @@ data class Game(
         return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
     }
 
-    fun addPlayer(playerName: String): Player? {
+    fun addPlayer(playerName: String): Player {
         if (state != GameState.WAITING_FOR_PLAYERS) {
             throw IllegalStateException("Cannot add players in the current state: $state")
         }
