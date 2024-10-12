@@ -6,4 +6,12 @@ import kotlinx.serialization.Serializable
 data class Game(
     val id: String,
     val pin: String,
-    val players: MutableList<Player> = mutableListOf())
+    val title: String,
+    val players: MutableList<Player> = mutableListOf(),
+    val questions: MutableList<Question> = mutableListOf()
+) {
+
+    fun currentQuestion(): Question? {
+        return questions.lastOrNull() // TODO must check that the last one is still active
+    }
+}
