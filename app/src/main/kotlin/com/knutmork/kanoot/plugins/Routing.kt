@@ -16,8 +16,8 @@ fun Application.configureRouting() {
             call.respondText("Hello Quiz masters!")
         }
         post("/initGame") {
-            val parameters = call.receiveParameters()
-            val title = parameters["title"] ?: ""
+            val requestBody = call.receive<Map<String, String>>()
+            val title = requestBody["title"] ?: return@post call.respondText("Missing title", status = HttpStatusCode.BadRequest)
             val game = gameService.addGame(title)
             call.respond(mapOf("id" to game.id, "pin" to game.pin))
         }
