@@ -22,14 +22,16 @@ class Game(
     val id: String,
     val pin: String,
     val title: String,
-    val players: MutableList<Player> = mutableListOf(),
-    val questions: MutableList<Question> = mutableListOf(),
-    var state: GameState = GameState.READY
 ) {
+    private val players: MutableList<Player> = mutableListOf()
+    private val questions: MutableList<Question> = mutableListOf()
+    private var state: GameState = GameState.READY
+    private val questionTimers = mutableMapOf<Int, Job>()
+
+    val createdAt: Long = System.currentTimeMillis()
+
     val leaderboard: Leaderboard
         get() = Leaderboard(players.sortedByDescending { it.pointsTotal })
-
-    private val questionTimers = mutableMapOf<Int, Job>()
 
     companion object {
         fun init(title: String): Game {

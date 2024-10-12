@@ -1,8 +1,17 @@
 package com.knutmork.kanoot.model
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
 class GameServer {
     private val games = mutableMapOf<String, Game>()
     private val pinToUuid = mutableMapOf<String, String>()
+
+    init {
+        startCleanupJob()
+    }
 
     fun addGame(title: String): Game {
         val game = Game.init(title)
@@ -39,5 +48,15 @@ class GameServer {
     private fun gameByPin(pin: String): Game? {
         val uuid = pinToUuid[pin]
         return if (uuid != null) gameByUuid(uuid) else null
+    }
+
+    private fun startCleanupJob() {
+        CoroutineScope(Dispatchers.Default).launch {
+            while (true) {
+                delay(3600000L) // 1 hour
+                val currentTime = System.currentTimeMillis()
+                games.entries.removeIf { currentTime - it.value.createdAt > 3600000L }
+            }
+        }
     }
 }
