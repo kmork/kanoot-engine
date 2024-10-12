@@ -1,7 +1,7 @@
 package com.knutmork.kanoot.plugins
 
 import com.knutmork.kanoot.model.Question
-import com.knutmork.kanoot.service.GameService
+import com.knutmork.kanoot.model.GameServer
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -9,7 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
-    val gameService = GameService()
+    val gameService = GameServer()
 
     routing {
         get("/") {
@@ -18,7 +18,7 @@ fun Application.configureRouting() {
         post("/initGame") {
             val parameters = call.receiveParameters()
             val title = parameters["title"] ?: ""
-            val game = gameService.initGame(title)
+            val game = gameService.addGame(title)
             call.respond(mapOf("id" to game.id, "pin" to game.pin))
         }
 
