@@ -12,6 +12,6 @@ data class Game(
 ) {
 
     fun currentQuestion(): Question? {
-        return questions.lastOrNull() // TODO must check that the last one is still active
+        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
     }
 }

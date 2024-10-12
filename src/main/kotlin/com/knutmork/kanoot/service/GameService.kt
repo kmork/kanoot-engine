@@ -1,6 +1,7 @@
 package com.knutmork.kanoot.service
 
 import com.knutmork.kanoot.model.Game
+import com.knutmork.kanoot.model.Leaderboard
 import com.knutmork.kanoot.model.Player
 import com.knutmork.kanoot.model.Question
 import kotlinx.coroutines.*
@@ -52,6 +53,12 @@ class GameService {
         }
     }
 
+    fun showLeaderboard(uuid: String): Leaderboard? {
+        val game = gameByUuid(uuid)
+        return game?.let {
+            Leaderboard(it.players.sortedByDescending { player -> player.pointsTotal })
+        }
+    }
     fun removeGame(gameId: String) {
         games.remove(gameId)
         questionTimers[gameId]?.cancel()

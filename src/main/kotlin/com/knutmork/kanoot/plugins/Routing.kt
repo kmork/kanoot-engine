@@ -30,6 +30,19 @@ fun Application.configureRouting() {
             call.respondText("Game Ended")
         }
 
+        get("/games/{uuid}/leaderboard") {
+            val uuid = call.parameters["uuid"] ?: return@get call.respondText("Missing Game UUID", status = HttpStatusCode.BadRequest)
+            val leaderboard = gameService.showLeaderboard(uuid)
+            if (leaderboard != null) {
+                val leaderboardResponse = leaderboard.players.map { player ->
+                    mapOf("playerName" to player.name, "pointsTotal" to player.pointsTotal)
+                }
+                call.respond(leaderboardResponse)
+            } else {
+                call.respondText("Game not found", status = HttpStatusCode.NotFound)
+            }
+        }
+
         post("/games/{uuid}/removeGame") {
             val uuid = call.parameters["uuid"] ?: return@post call.respondText("Missing Game UUID", status = HttpStatusCode.BadRequest)
             gameService.removeGame(uuid)
