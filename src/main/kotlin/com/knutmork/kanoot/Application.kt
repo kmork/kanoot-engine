@@ -1,6 +1,6 @@
 package com.knutmork.kanoot
 
-import com.example.plugins.*
+import com.knutmork.kanoot.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
