@@ -53,7 +53,7 @@ class AddPlayerCommand : BaseCommand("add-player", "Add a player to a game") {
     private val playerName by argument(ArgType.String, description = "Player name")
 
     override fun execute() = runBlocking {
-        val response: HttpResponse = client.post("http://localhost:8080/games/$pin/players") {
+        val response: HttpResponse = client.post("http://localhost:8080/$pin/joinGame") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("name" to playerName))
         }

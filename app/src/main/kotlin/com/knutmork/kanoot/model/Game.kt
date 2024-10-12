@@ -50,7 +50,7 @@ class Game(
     }
 
     fun addPlayer(playerName: String): Player {
-        if (state != GameState.WAITING_FOR_PLAYERS) {
+        if (state == GameState.ENDED) {
             throw IllegalStateException("Cannot add players in the current state: $state")
         }
         val player = Player(UUID.randomUUID().toString(), playerName)

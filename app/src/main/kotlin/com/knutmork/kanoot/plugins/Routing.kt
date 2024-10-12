@@ -58,8 +58,8 @@ fun Application.configureRouting() {
 
         post("/{pin}/joinGame") {
             val pin = call.parameters["pin"] ?: return@post call.respondText("Missing Game pin", status = HttpStatusCode.BadRequest)
-            val parameters = call.receiveParameters()
-            val playerName = parameters["name"] ?: return@post call.respondText("Missing player name", status = HttpStatusCode.BadRequest)
+            val requestBody = call.receive<Map<String, String>>()
+            val playerName = requestBody["name"] ?: return@post call.respondText("Missing player name", status = HttpStatusCode.BadRequest)
             val player = gameService.addPlayerToGame(pin, playerName)
             if (player != null) {
                 call.respond(mapOf("playerId" to player.id, "playerName" to player.name))
