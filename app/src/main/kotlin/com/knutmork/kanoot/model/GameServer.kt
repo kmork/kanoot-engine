@@ -20,6 +20,10 @@ class GameServer {
         return game
     }
 
+    fun resetGame(gameId: String) {
+        gameByUuid(gameId)?.reset()
+    }
+
     fun addPlayerToGame(pin: String, playerName: String): Player? {
         return gameByPin(pin)?.addPlayer(playerName)
     }
@@ -39,6 +43,10 @@ class GameServer {
     fun removeGame(gameId: String) {
         gameByUuid(gameId)?.endGame()
         games.remove(gameId)
+    }
+
+    override fun toString(): String {
+        return games.values.joinToString(separator = "\n") { it.toString() }
     }
 
     private fun gameByUuid(uuid: String): Game? {

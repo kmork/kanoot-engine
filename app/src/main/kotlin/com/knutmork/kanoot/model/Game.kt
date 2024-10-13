@@ -49,6 +49,16 @@ class Game(
         return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 } // TODO: Should we use state instead?
     }
 
+    fun reset() {
+        state = GameState.READY
+        cancelTimers()
+    }
+
+    override fun toString(): String {
+        val playersString = players.joinToString(separator = ", ") { it.name }
+        return "Game(id=$id, pin=$pin, state=$state, players=[$playersString])"
+    }
+
     fun addPlayer(playerName: String): Player {
         if (state == GameState.ENDED) {
             throw IllegalStateException("Cannot add players in the current state: $state")

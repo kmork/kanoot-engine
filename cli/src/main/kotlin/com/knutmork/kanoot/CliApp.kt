@@ -19,7 +19,10 @@ fun main(args: Array<String>) {
     val command = parser.subcommands(
         AddGameCommand(),
         AddPlayerCommand(),
-        ShowLeaderboardCommand()
+        ShowLeaderboardCommand(),
+        ListGamesCommand(),
+        RemoveGameCommand(),
+        ResetGameCommand()
     )
 
     parser.parse(args)
@@ -40,7 +43,7 @@ class AddGameCommand : BaseCommand("add-game", "Add a new game") {
     private val title by argument(ArgType.String, description = "Title of the game")
 
     override fun execute() = runBlocking {
-        val response: HttpResponse = client.post("http://localhost:8080/initGame") {
+        val response: HttpResponse = client.post("http://localhost:8080/games/initGame") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("title" to title))
         }
@@ -53,7 +56,7 @@ class AddPlayerCommand : BaseCommand("add-player", "Add a player to a game") {
     private val playerName by argument(ArgType.String, description = "Player name")
 
     override fun execute() = runBlocking {
-        val response: HttpResponse = client.post("http://localhost:8080/$pin/joinGame") {
+        val response: HttpResponse = client.post("http://localhost:8080/play/$pin/joinGame") {
             contentType(ContentType.Application.Json)
             setBody(mapOf("name" to playerName))
         }
@@ -67,5 +70,30 @@ class ShowLeaderboardCommand : BaseCommand("show-leaderboard", "Show the leaderb
     override fun execute() = runBlocking {
         val response: HttpResponse = client.get("http://localhost:8080/games/$uuid/leaderboard")
         println("Leaderboard: ${response.bodyAsText()}")
+    }
+}
+
+class ListGamesCommand : BaseCommand("list-games", "Show all games - admin only") {
+    override fun execute() = runBlocking {
+        val response: HttpResponse = client.get("http://localhost:8080/admin/games")
+        println(response.bodyAsText())
+    }
+}
+
+class RemoveGameCommand : BaseCommand("remove-game", "Deletes a game") {
+    private val uuid by argument(ArgType.String, description = "Game UUID")
+
+    override fun execute() = runBlocking {
+        val response: HttpResponse = client.post("http://localhost:8080/admin/games/$uuid/remove")
+        println(response.bodyAsText())
+    }
+}
+
+class ResetGameCommand : BaseCommand("reset-game", "Reset the state of a game. Players and questions are still present") {
+    private val uuid by argument(ArgType.String, description = "Game UUID")
+
+    override fun execute() = runBlocking {
+        val response: HttpResponse = client.post("http://localhost:8080/admin/games/$uuid/reset")
+        println(response.bodyAsText())
     }
 }
