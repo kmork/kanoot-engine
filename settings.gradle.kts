@@ -1,3 +1,3 @@
 include("cli")
 include("app")
-rootProject.name = "kanoot"
+rootProject.name = "kanoot-engine"
