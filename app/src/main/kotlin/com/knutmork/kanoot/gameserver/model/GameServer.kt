@@ -24,8 +24,13 @@ class GameServer {
         gameByUuid(gameId)?.reset()
     }
 
-    fun addPlayerToGame(pin: String, playerName: String): Player? {
-        return gameByPin(pin)?.addPlayer(playerName)
+    fun addPlayer(pin: String): Player? {
+        return gameByPin(pin)?.addPlayer()
+    }
+
+    fun setPlayerNickname(pin: String, playerId: String, playerName: String): Player? {
+        val game = gameByPin(pin) ?: return null
+        return game.setPlayerNickname(playerId, playerName)
     }
 
     fun addQuestion(gameId: String, question: Question) {

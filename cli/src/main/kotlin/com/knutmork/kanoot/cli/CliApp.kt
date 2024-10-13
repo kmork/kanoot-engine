@@ -10,15 +10,13 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
-//$ kotlin CliApp.kt add-game "My New Game"
-//$ kotlin CliApp.kt add-player 1234 "Player1"
-//$ kotlin CliApp.kt show-leaderboard some-uuid
 fun main(args: Array<String>) {
     val parser = ArgParser("kanoot-cli")
 
     val command = parser.subcommands(
         AddGameCommand(),
         AddPlayerCommand(),
+        SetNicknameCommand(),
         ShowLeaderboardCommand(),
         ListGamesCommand(),
         RemoveGameCommand(),
@@ -53,14 +51,26 @@ class AddGameCommand : BaseCommand("add-game", "Add a new game") {
 
 class AddPlayerCommand : BaseCommand("add-player", "Add a player to a game") {
     private val pin by argument(ArgType.String, description = "Game PIN")
-    private val playerName by argument(ArgType.String, description = "Player name")
 
     override fun execute() = runBlocking {
         val response: HttpResponse = client.post("http://localhost:8080/play/$pin/joinGame") {
             contentType(ContentType.Application.Json)
-            setBody(mapOf("name" to playerName))
         }
         println("Player added: ${response.bodyAsText()}")
+    }
+}
+
+class SetNicknameCommand : BaseCommand("set-nickname", "Set the nickname of a player") {
+    private val pin by argument(ArgType.String, description = "Game PIN")
+    private val playerId by argument(ArgType.String, description = "Player ID")
+    private val nickname by argument(ArgType.String, description = "Player nickname")
+
+    override fun execute() = runBlocking {
+        val response: HttpResponse = client.post("http://localhost:8080/play/$pin/player/$playerId/nickname") {
+            contentType(ContentType.Application.Json)
+            setBody(mapOf("nickname" to nickname))
+        }
+        println("Nickname set: ${response.bodyAsText()}")
     }
 }
 

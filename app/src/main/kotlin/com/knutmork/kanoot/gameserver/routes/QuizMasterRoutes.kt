@@ -30,7 +30,7 @@ fun Route.quizMasterRoutes(gameService: GameServer) {
             val leaderboard = gameService.showLeaderboard(uuid)
             if (leaderboard != null) {
                 val leaderboardResponse = leaderboard.players.map { player ->
-                    mapOf("playerName" to player.name, "pointsTotal" to player.pointsTotal)
+                    mapOf("playerName" to player.nickname, "pointsTotal" to player.pointsTotal)
                 }
                 call.respond(leaderboardResponse)
             } else {

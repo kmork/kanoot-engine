@@ -23,7 +23,7 @@ class Game(
     val pin: String,
     val title: String,
 ) {
-    private val players: MutableList<Player> = mutableListOf()
+    private val players: MutableMap<String, Player> = mutableMapOf()
     private val questions: MutableList<Question> = mutableListOf()
     private var state: GameState = GameState.READY
     private val questionTimers = mutableMapOf<Int, Job>()
@@ -31,7 +31,7 @@ class Game(
     val createdAt: Long = System.currentTimeMillis()
 
     val leaderboard: Leaderboard
-        get() = Leaderboard(players.sortedByDescending { it.pointsTotal })
+        get() = Leaderboard(players.values.sortedByDescending { it.pointsTotal })
 
     companion object {
         fun init(title: String): Game {
@@ -55,16 +55,22 @@ class Game(
     }
 
     override fun toString(): String {
-        val playersString = players.joinToString(separator = ", ") { it.name }
+        val playersString = players.values.joinToString(separator = ", ") { "${it.id}:${it.nickname}" }
         return "Game(id=$id, pin=$pin, state=$state, players=[$playersString])"
     }
 
-    fun addPlayer(playerName: String): Player {
+    fun addPlayer(): Player {
         if (state == GameState.ENDED) {
             throw IllegalStateException("Cannot add players in the current state: $state")
         }
-        val player = Player(UUID.randomUUID().toString(), playerName)
-        players.add(player)
+        val player = Player(UUID.randomUUID().toString())
+        players[player.id] = player
+        return player
+    }
+
+    fun setPlayerNickname(playerId: String, playerName: String): Player? {
+        val player = players[playerId] ?: return null
+        player.nickname = playerName
         return player
     }
 
@@ -81,7 +87,7 @@ class Game(
         if (state != GameState.QUESTIONING) {
             throw IllegalStateException("Cannot answer questions in the current state: $state")
         }
-        val player = players.find { it.id == playerId }
+        val player = players[playerId]
         val question = questions.find { it.questionNumber == questionNumber }
         if (player != null && question != null && question.timeInSeconds > 0) {
             val correctAnswers = question.alternatives.filter { it.correct }.map { it.id }
