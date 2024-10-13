@@ -1,6 +1,6 @@
 package com.knutmork.kanoot
 
-import com.knutmork.kanoot.plugins.*
+import com.knutmork.kanoot.routes.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*

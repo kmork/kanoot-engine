@@ -1,4 +1,4 @@
-package com.knutmork.kanoot.plugins
+package com.knutmork.kanoot.routes
 
 import com.knutmork.kanoot.model.GameServer
 import io.ktor.http.*
