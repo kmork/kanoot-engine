@@ -1,4 +1,4 @@
-package com.knutmork.kanoot
+package com.knutmork.kanoot.cli
 
 import kotlinx.cli.*
 import io.ktor.client.*

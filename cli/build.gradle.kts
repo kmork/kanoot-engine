@@ -10,11 +10,11 @@ plugins {
 
 }
 
-group = "com.knutmork.kanoot-cli"
+group = "com.knutmork.kanoot.cli"
 version = "0.0.1"
 
 application {
-    mainClass.set("com.knutmork.kanoot.CliAppKt")
+    mainClass.set("com.knutmork.kanoot.cli.CliAppKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -36,6 +36,6 @@ dependencies {
 
 tasks.withType<Jar> {
     manifest {
-        attributes["Main-Class"] = "com.knutmork.kanoot.CliAppKt"
+        attributes["Main-Class"] = "com.knutmork.kanoot.cli.CliAppKt"
     }
 }

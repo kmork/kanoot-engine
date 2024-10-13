@@ -1,4 +1,4 @@
-package com.knutmork.kanoot.model
+package com.knutmork.kanoot.gameserver.model
 
 import kotlinx.serialization.Serializable
 

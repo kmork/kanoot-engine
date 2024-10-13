@@ -1,7 +1,7 @@
-package com.knutmork.kanoot.routes
+package com.knutmork.kanoot.gameserver.routes
 
-import com.knutmork.kanoot.model.Question
-import com.knutmork.kanoot.model.GameServer
+import com.knutmork.kanoot.gameserver.model.Question
+import com.knutmork.kanoot.gameserver.model.GameServer
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*

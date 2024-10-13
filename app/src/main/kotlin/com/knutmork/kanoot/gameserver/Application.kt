@@ -1,6 +1,6 @@
-package com.knutmork.kanoot
+package com.knutmork.kanoot.gameserver
 
-import com.knutmork.kanoot.routes.*
+import com.knutmork.kanoot.gameserver.routes.configureRouting
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
