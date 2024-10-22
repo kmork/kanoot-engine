@@ -2,6 +2,7 @@ package com.knutmork.kanoot.gameserver.routes
 
 import com.knutmork.kanoot.gameserver.model.Question
 import com.knutmork.kanoot.gameserver.model.GameServer
+import com.knutmork.kanoot.gameserver.questionReceivedChannel
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -48,7 +49,10 @@ fun Route.quizMasterRoutes(gameService: GameServer) {
             val uuid = call.parameters["uuid"] ?: return@post call.respondText("Missing Game UUID", status = HttpStatusCode.BadRequest)
             val questionRequest = call.receive<Question>()
             gameService.addQuestion(uuid, questionRequest)
+
+            // Signal that a question has been received
+            questionReceivedChannel.send(Unit)
+
             call.respond(HttpStatusCode.OK, "Question received for game $uuid")
-        }
-    }
+        }    }
 }
