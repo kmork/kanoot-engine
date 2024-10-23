@@ -6,11 +6,11 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Route.playerRoutes(gameService: GameServer) {
+fun Route.playerRoutes(gameServer: GameServer) {
     route("/play") {
         post("/{pin}/joinGame") {
             val pin = call.parameters["pin"] ?: return@post call.respondText("Missing Game pin", status = HttpStatusCode.BadRequest)
-            val player = gameService.addPlayer(pin)
+            val player = gameServer.addPlayer(pin)
             if (player != null) {
                 call.respond(mapOf("playerId" to player.id))
             } else {
@@ -23,7 +23,7 @@ fun Route.playerRoutes(gameService: GameServer) {
             val playerId = call.parameters["playerId"] ?: return@post call.respondText("Missing player id", status = HttpStatusCode.BadRequest)
             val requestBody = call.receive<Map<String, String>>()
             val nickname = requestBody["nickname"] ?: return@post call.respondText("Missing player name", status = HttpStatusCode.BadRequest)
-            val player = gameService.setPlayerNickname(pin, playerId, nickname)
+            val player = gameServer.setPlayerNickname(pin, playerId, nickname)
             if (player != null) {
                 call.respond(mapOf("playerId" to player.id, "playerName" to player.nickname))
             } else {
@@ -38,7 +38,7 @@ fun Route.playerRoutes(gameService: GameServer) {
             val questionNumber = parameters["questionNumber"]?.toIntOrNull() ?: return@post call.respondText("Missing question number", status = HttpStatusCode.BadRequest)
 
             val answer = parameters.getAll("answer")?.mapNotNull { it.toIntOrNull() } ?: return@post call.respondText("Missing answer", status = HttpStatusCode.BadRequest)
-            gameService.answerQuestion(pin, playerId, questionNumber, answer)
+            gameServer.answerQuestion(pin, playerId, questionNumber, answer)
             call.respondText("Answer received")
         }
     }

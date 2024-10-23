@@ -6,15 +6,16 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
 fun Application.configureRouting() {
-    val gameService = GameServer()
+    val gameServer = GameServer()
 
     routing {
         get("/") {
             call.respondText("Hello Quiz masters!")
         }
 
-        playerRoutes(gameService)
-        quizMasterRoutes(gameService)
-        adminRoutes(gameService)
+        playerRoutes(gameServer)
+        quizMasterRoutes(gameServer)
+        adminRoutes(gameServer)
+        configureWebSockets(gameServer)
     }
 }

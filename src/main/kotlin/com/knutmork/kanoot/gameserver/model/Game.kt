@@ -6,12 +6,18 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import java.util.*
 
 enum class GameState {
     READY,
     WAITING_FOR_PLAYERS,
-    STARTING_QUESTION,
+    STARTING_QUESTION_1,
+    STARTING_QUESTION_2,
+    STARTING_QUESTION_3,
+    STARTING_QUESTION_4,
+    STARTING_QUESTION_5,
     QUESTIONING,
     QUESTION_ENDED,
     ENDED
@@ -25,13 +31,26 @@ class Game(
 ) {
     private val players: MutableMap<String, Player> = mutableMapOf()
     private val questions: MutableList<Question> = mutableListOf()
-    private var state: GameState = GameState.READY
+    private val prepareTimers = mutableMapOf<Int, Job>()
     private val questionTimers = mutableMapOf<Int, Job>()
 
     val createdAt: Long = System.currentTimeMillis()
 
     val leaderboard: Leaderboard
         get() = Leaderboard(players.values.sortedByDescending { it.pointsTotal })
+
+    private val _gameStateChannel = Channel<GameState>(Channel.BUFFERED)
+    val gameStateChannel: ReceiveChannel<GameState> get() = _gameStateChannel
+
+    private var _state: GameState = GameState.READY
+    var state: GameState
+        get() = _state
+        private set(value) {
+            _state = value
+            CoroutineScope(Dispatchers.Default).launch {
+                _gameStateChannel.send(value)
+            }
+        }
 
     companion object {
         fun init(title: String): Game {
@@ -46,7 +65,7 @@ class Game(
     }
 
     fun currentQuestion(): Question? {
-        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 } // TODO: Should we use state instead?
+        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
     }
 
     fun reset() {
@@ -79,8 +98,8 @@ class Game(
             throw IllegalStateException("Cannot add questions in the current state: $state")
         }
         questions.add(question)
-        state = GameState.STARTING_QUESTION
-        startQuestionTimer(question.questionNumber)
+        state = GameState.STARTING_QUESTION_1
+        prepareQuestionTimer(question.questionNumber)
     }
 
     fun answerQuestion(playerId: String, questionNumber: Int, answer: List<Int>) {
@@ -105,6 +124,18 @@ class Game(
         cancelTimers()
     }
 
+    private fun prepareQuestionTimer(questionNumber: Int) {
+        val job = CoroutineScope(Dispatchers.Default).launch {
+            for (i in 1..5) {
+                state = GameState.valueOf("STARTING_QUESTION_$i")
+                delay(1000L)
+            }
+            state = GameState.QUESTIONING
+            startQuestionTimer(questionNumber)
+        }
+        prepareTimers[questionNumber] = job
+    }
+
     private fun startQuestionTimer(questionNumber: Int) {
         val question = questions.find { it.questionNumber == questionNumber } ?: return
 
@@ -115,7 +146,6 @@ class Game(
                 delay(1000L)
                 timeLeft--
             }
-            // Time is up, no more answers can be accepted
             question.timeInSeconds = 0
             state = GameState.QUESTION_ENDED
         }
@@ -127,6 +157,8 @@ class Game(
     }
 
     private fun cancelTimers() {
+        prepareTimers.values.forEach { it.cancel() }
+        prepareTimers.clear()
         questionTimers.values.forEach { it.cancel() }
         questionTimers.clear()
     }

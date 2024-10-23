@@ -58,7 +58,7 @@ class GameServer {
         return games[uuid]
     }
 
-    private fun gameByPin(pin: String): Game? {
+    fun gameByPin(pin: String): Game? {
         val uuid = pinToUuid[pin]
         return if (uuid != null) gameByUuid(uuid) else null
     }

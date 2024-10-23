@@ -1,7 +1,6 @@
 package com.knutmork.kanoot.gameserver
 
 import com.knutmork.kanoot.gameserver.routes.configureRouting
-import com.knutmork.kanoot.gameserver.routes.configureWebSockets
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -13,7 +12,9 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+    val port = System.getenv("PORT")?.toInt() ?: 8080
+    val host = System.getenv("HOST")?: "0.0.0.0"
+    embeddedServer(Netty, port = port, host = host, module = Application::module)
         .start(wait = true)
 }
 
@@ -30,5 +31,4 @@ fun Application.module() {
         masking = false
     }
     configureRouting()
-    configureWebSockets()
 }
