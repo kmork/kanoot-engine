@@ -1,5 +1,6 @@
 package com.knutmork.kanoot.gameserver.model
 
+import com.knutmork.kanoot.gameserver.routes.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -12,7 +13,6 @@ import java.util.*
 
 enum class GameState {
     READY,
-    WAITING_FOR_PLAYERS,
     STARTING_QUESTION_1,
     STARTING_QUESTION_2,
     STARTING_QUESTION_3,
@@ -64,10 +64,6 @@ class Game(
         }
     }
 
-    fun currentQuestion(): Question? {
-        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
-    }
-
     fun reset() {
         state = GameState.READY
         cancelTimers()
@@ -84,13 +80,12 @@ class Game(
         }
         val player = Player(UUID.randomUUID().toString())
         players[player.id] = player
+        logger.info("New player connected and added to game $id")
         return player
     }
 
-    fun setPlayerNickname(playerId: String, playerName: String): Player? {
-        val player = players[playerId] ?: return null
-        player.nickname = playerName
-        return player
+    fun playerById(playerId: String): Player? {
+        return players[playerId]
     }
 
     fun addQuestion(question: Question) {
@@ -98,30 +93,36 @@ class Game(
             throw IllegalStateException("Cannot add questions in the current state: $state")
         }
         questions.add(question)
+        logger.info("Question added to game $id")
         state = GameState.STARTING_QUESTION_1
         prepareQuestionTimer(question.questionNumber)
     }
 
-    fun answerQuestion(playerId: String, questionNumber: Int, answer: List<Int>) {
+    fun answerQuestion(player: Player, answer: List<Int>) {
         if (state != GameState.QUESTIONING) {
             throw IllegalStateException("Cannot answer questions in the current state: $state")
         }
-        val player = players[playerId]
-        val question = questions.find { it.questionNumber == questionNumber }
-        if (player != null && question != null && question.timeInSeconds > 0) {
-            val correctAnswers = question.alternatives.filter { it.correct }.map { it.id }
-            val correct = correctAnswers.size == answer.size && correctAnswers.containsAll(answer)
-            if (correct) {
-                val points = calculatePoints(question.timeInSeconds, question.timeInSeconds)
-                player.pointsThisRound += points
-                player.pointsTotal += player.pointsThisRound
-            }
+        val question = currentQuestion() ?: run {
+            logger.info("Player $player answered too late")
+            return
+        }
+
+        logger.info("Player $player answered question ${question.questionNumber} with $answer")
+        val correctAnswers = question.alternatives.filter { it.correct }.map { it.id }
+        if (correctAnswers.size == answer.size && correctAnswers.containsAll(answer)) {
+            val points = calculatePoints(question.timeInSeconds, question.timeInSeconds)
+            player.pointsThisRound += points
+            player.pointsTotal += player.pointsThisRound
         }
     }
 
     fun endGame() {
         state = GameState.ENDED
         cancelTimers()
+    }
+
+    private fun currentQuestion(): Question? {
+        return questions.lastOrNull()?.takeIf { it.timeInSeconds > 0 }
     }
 
     private fun prepareQuestionTimer(questionNumber: Int) {

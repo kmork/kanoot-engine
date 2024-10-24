@@ -24,21 +24,8 @@ class GameServer {
         gameByUuid(gameId)?.reset()
     }
 
-    fun addPlayer(pin: String): Player? {
-        return gameByPin(pin)?.addPlayer()
-    }
-
-    fun setPlayerNickname(pin: String, playerId: String, playerName: String): Player? {
-        val game = gameByPin(pin) ?: return null
-        return game.setPlayerNickname(playerId, playerName)
-    }
-
     fun addQuestion(gameId: String, question: Question) {
         gameByUuid(gameId)?.addQuestion(question)
-    }
-
-    fun answerQuestion(pin: String, playerId: String, questionNumber: Int, answer: List<Int>) {
-        gameByPin(pin)?.answerQuestion(playerId, questionNumber, answer)
     }
 
     fun showLeaderboard(uuid: String): Leaderboard? {
@@ -50,17 +37,17 @@ class GameServer {
         games.remove(gameId)
     }
 
+    fun gameByPin(pin: String): Game? {
+        val uuid = pinToUuid[pin]
+        return if (uuid != null) gameByUuid(uuid) else null
+    }
+
     override fun toString(): String {
         return games.values.joinToString(separator = "\n") { it.toString() }
     }
 
     private fun gameByUuid(uuid: String): Game? {
         return games[uuid]
-    }
-
-    fun gameByPin(pin: String): Game? {
-        val uuid = pinToUuid[pin]
-        return if (uuid != null) gameByUuid(uuid) else null
     }
 
     private fun startCleanupJob() {

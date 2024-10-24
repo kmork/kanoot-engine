@@ -49,5 +49,6 @@ fun Route.quizMasterRoutes(gameServer: GameServer) {
             val questionRequest = call.receive<Question>()
             gameServer.addQuestion(uuid, questionRequest)
             call.respond(HttpStatusCode.OK, "Question received for game $uuid")
-        }    }
+        }
+    }
 }

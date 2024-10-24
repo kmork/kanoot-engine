@@ -4,6 +4,9 @@ import com.knutmork.kanoot.gameserver.model.GameServer
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.slf4j.LoggerFactory
+
+val logger = LoggerFactory.getLogger("Routing")
 
 fun Application.configureRouting() {
     val gameServer = GameServer()
@@ -13,9 +16,8 @@ fun Application.configureRouting() {
             call.respondText("Hello Quiz masters!")
         }
 
-        playerRoutes(gameServer)
         quizMasterRoutes(gameServer)
         adminRoutes(gameServer)
-        configureWebSockets(gameServer)
+        playerRoutes(gameServer)
     }
 }
