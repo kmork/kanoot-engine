@@ -5,8 +5,10 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.serialization.json.Json
+import org.slf4j.event.Level
 
 fun main() {
     val port = System.getenv("PORT")?.toInt() ?: 8080
@@ -20,6 +22,10 @@ fun Application.module() {
         json(Json {
             prettyPrint = true
             isLenient = true
-        })    }
+        })
+    }
+    install(CallLogging) {
+        level = Level.INFO
+    }
     configureRouting()
 }

@@ -71,7 +71,7 @@ class Game(
 
     override fun toString(): String {
         val playersString = players.values.joinToString(separator = ", ") { "${it.id}:${it.nickname}" }
-        return "Game(id=$id, pin=$pin, state=$state, players=[$playersString])"
+        return "Game(id=$id, pin=$pin, titile=$title, state=$state, players=[$playersString])"
     }
 
     fun addPlayer(): Player {
